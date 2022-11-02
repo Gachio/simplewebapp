@@ -1,5 +1,5 @@
 module "iam_instance_profile" {
-    source = "terraform-captain/iip/aws"
+    source = "terraform-in-action/iip/aws"
     actions = ["logs:*", "rds:*"]
 }
 
@@ -25,7 +25,7 @@ resource "aws_launch_template" "webserver" {
     name_prefix = var.namespace
     image_id = data.aws_ami.ubuntu.id
     instance_type = "t2.micro"
-    user_date = data.cloudinit_config.config.rendered
+    user_data = data.cloudinit_config.config.rendered
     key_name = var.ssh_keypair
     iam_instance_profile {
         name = module.iam_instance_profile.name
@@ -38,7 +38,7 @@ resource "aws_autoscaling_group" "webserver" {
     min_size = 1
     max_size = 3
     vpc_zone_identifier = var.vpc.private_subnets
-    target_groups_arns = module.alb.target_groups_arns
+    target_group_arns = module.alb.target_group_arns
     launch_template {
         id = aws_launch_template.webserver.id
         version = aws_launch_template.webserver.latest_version
